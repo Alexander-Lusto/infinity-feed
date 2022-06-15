@@ -13,61 +13,70 @@ export default class InfinitySlider {
     
     this._SLIDER_WIDTH = this._wrapperWidth - this._wrapperPadding;
     this._SLIDES_NUMBER = this._SLIDER_WIDTH / this._slideWidth;
+    this._MIN_SLIDES_NUMBER = 10;
 
     this._shift = 0;
     this._left = 0;
-    this._slideIndex = 0;
+
+    this._positionIndex = 0;
+    this._positionIndexMax = this.slides.length / this._SLIDES_NUMBER - 1;
   }
 
   init() {
+    if (this.slides.length < this._MIN_SLIDES_NUMBER) {
+      this.leftButton.style.display = `none`;
+      this.rightButton.style.display = `none`;
+    }
     this._setRightButtonClickHandler();
     this._setLeftButtonClickHandler();
   }
 
-  _setLeftButtonClickHandler() { // ok
+  _setLeftButtonClickHandler() {
     this.leftButton.addEventListener(`click`, () => {
-      (this._slideIndex > this._SLIDES_NUMBER) ? this._slideIndex -= this._SLIDES_NUMBER : ``;
-      
-      if (this._slideIndex <= this._SLIDES_NUMBER) {
+
+      if (this._positionIndex === 0) {
         this._addSlidesToTheBegining();
         this._left -= this._SLIDER_WIDTH;
         
         this.list.style.left = this._left + `px`; 
+      } else {
+        this._positionIndex--;
       }
 
       this._shift += this._SLIDER_WIDTH; 
       this.list.style.transform = `translateX(${this._shift}px)`;
 
-      console.log(this._slideIndex);
+      console.log(this._positionIndex);
     });
   }
 
-  _setRightButtonClickHandler() { // ok
+  _setRightButtonClickHandler() {
     this.rightButton.addEventListener(`click`, () => {
-      (this._slideIndex < this.slides.length) ? this._slideIndex += this._SLIDES_NUMBER : ``;
-      
-      if (this._slideIndex >= this.slides.length) {
+
+      if (this._positionIndex === this._positionIndexMax) {
         this._addSlidesToTheEnd();
         this._left += this._SLIDER_WIDTH;
 
         this.list.style.left = this._left + `px`;
-      } 
+      } else {
+        this._positionIndex++;
+      }
         
       this._shift -= this._SLIDER_WIDTH;
       this.list.style.transform = `translateX(${this._shift}px)`;
 
-      console.log(this._slideIndex);
+      console.log(this._positionIndex);
     });
   }
 
-  _addSlidesToTheEnd() { // ok
+  _addSlidesToTheEnd() {
     const firstSlides = this.slides.splice(0, this._SLIDES_NUMBER);
     this.slides = [].concat(this.slides, firstSlides);
     
     firstSlides.forEach((slide) => this.list.insertAdjacentElement(`beforeend`, slide));
   }
 
-  _addSlidesToTheBegining() { // ok
+  _addSlidesToTheBegining() {
     const lastSlides = this.slides.splice(this.slides.length - this._SLIDES_NUMBER, this._SLIDES_NUMBER);
     this.slides = [].concat(lastSlides, this.slides);
 
